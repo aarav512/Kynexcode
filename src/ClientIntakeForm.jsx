@@ -60,6 +60,7 @@ export default function ClientIntakeForm() {
         return next;
       });
     }
+    if (status === "error") setStatus("idle");
   }
 
   function validate() {
@@ -86,6 +87,7 @@ export default function ClientIntakeForm() {
     const errs = validate();
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
+      setStatus("idle");
       return;
     }
 
@@ -93,13 +95,14 @@ export default function ClientIntakeForm() {
     setErrors({});
 
     try {
+      const payload = { ...form, agreeTerms: form.agreeTerms ? "Yes" : "No" };
       const response = await fetch(FORMSPREE_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -137,7 +140,7 @@ export default function ClientIntakeForm() {
           Your intake form has been submitted successfully. We'll review your
           information and get back to you within 1–2 business days.
         </p>
-        <button className="btn btn-secondary" onClick={() => setStatus("idle")}>
+        <button className="btn btn-secondary" onClick={() => { setStatus("idle"); setErrors({}); }}>
           Submit another form
         </button>
       </div>
